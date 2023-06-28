@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { faCoins } from '@fortawesome/free-solid-svg-icons'
 import { useUser } from '@auth0/nextjs-auth0/client'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export const AppLayout = ({ children }) => {
 	const { user, error, isLoading } = useUser()
@@ -9,9 +11,23 @@ export const AppLayout = ({ children }) => {
 		<div className='grid grid-cols-[300px_1fr] h-screen max-h-screen'>
 			<div className='flex flex-col text-white overflow-hidden'>
 				<div className='bg-slate-800'>
-					<div>logo</div>
-					<div>cta button</div>
-					<div>tokens</div>
+					<div className='bg-slate-800 px-2'>logo</div>
+					<Link
+						href='/post/new'
+						className='bg-green-500 tracking-wider w-full text-center text-white font-bold cursor-pointer uppercase px-4 py-2 rounded-md hover:bg-green-600 transition-colors block max-w-[270px] mx-auto'
+					>
+						New Post
+					</Link>
+					<Link
+						href='/token-topup'
+						className='block mt-2 text-center'
+					>
+						<FontAwesomeIcon
+							icon={faCoins}
+							className='text-yellow-500'
+						/>
+						<span className='pl-1'>0 token available</span>
+					</Link>
 				</div>
 				<div className='flex-1 overflow-auto bg-gradient-to-b from-slate-800 to-cyan-800'>
 					list of posts
@@ -31,7 +47,7 @@ export const AppLayout = ({ children }) => {
 								/>
 							</div>
 							<div className='flex-1 flex-col gap-2'>
-								<p className='font-bold'>{user.email}</p>
+								<div className='font-bold'>{user.email}</div>
 								<Link
 									className='text-sm'
 									href='/api/auth/logout'
