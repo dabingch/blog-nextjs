@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { Logo } from '../Logo'
 import { faCoins } from '@fortawesome/free-solid-svg-icons'
 import { useUser } from '@auth0/nextjs-auth0/client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -10,11 +11,11 @@ export const AppLayout = ({ children }) => {
 	return (
 		<div className='grid grid-cols-[300px_1fr] h-screen max-h-screen'>
 			<div className='flex flex-col text-white overflow-hidden'>
-				<div className='bg-slate-800'>
-					<div className='bg-slate-800 px-2'>logo</div>
+				<div className='bg-slate-800 px-2'>
+					<Logo />
 					<Link
 						href='/post/new'
-						className='bg-green-500 tracking-wider w-full text-center text-white font-bold cursor-pointer uppercase px-4 py-2 rounded-md hover:bg-green-600 transition-colors block max-w-[270px] mx-auto'
+						className='bg-green-500 tracking-wider w-full text-center text-white font-bold cursor-pointer uppercase px-4 py-2 rounded-md hover:bg-green-600 transition-colors block  mx-auto'
 					>
 						New Post
 					</Link>
