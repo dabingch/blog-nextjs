@@ -1,4 +1,5 @@
 import { getSession, withPageAuthRequired } from '@auth0/nextjs-auth0'
+import { getAppProps } from '../../utils/getAppProps'
 import { AppLayout } from '../../components/AppLayout'
 import clientPromise from '../../lib/mongodb'
 import { ObjectId } from 'mongodb'
@@ -50,6 +51,7 @@ Post.getLayout = function getLayout(page, pageProps) {
 
 export const getServerSideProps = withPageAuthRequired({
 	async getServerSideProps(ctx) {
+		const props = await getAppProps(ctx)
 		const { user } = await getSession(ctx.req, ctx.res)
 		const client = await clientPromise
 		const db = client.db('blogpostai')
@@ -79,6 +81,7 @@ export const getServerSideProps = withPageAuthRequired({
 					title: post.title,
 					metaDescription: post.metaDescription,
 					keywords: post.keywords,
+					...props,
 				},
 			}
 		} catch (error) {
