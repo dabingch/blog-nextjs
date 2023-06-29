@@ -1,6 +1,7 @@
 ## Note
 
 -   Auth0 usage
+-   hostname for image src
 -   pages structure
 -   dynamic route
 -   api usage with openai

@@ -35,6 +35,8 @@ export default function NewPost({}) {
 			console.log(error)
 		} finally {
 			setIsLoading(false)
+			setTopic('')
+			setKeywords('')
 		}
 	}
 
@@ -61,6 +63,7 @@ export default function NewPost({}) {
 								className='resize-none border border-slate-500 w-full block my-2 px-4 py-2 rounded-sm'
 								value={topic}
 								onChange={(e) => setTopic(e.target.value)}
+								maxLength={80}
 							/>
 						</div>
 						<div>
@@ -73,12 +76,17 @@ export default function NewPost({}) {
 								className='resize-none border border-slate-500 w-full block my-2 px-4 py-2 rounded-sm'
 								value={keywords}
 								onChange={(e) => setKeywords(e.target.value)}
+								maxLength={80}
 							/>
 							<small className='block mb-2 font-bold'>
 								Separate keywords with comma
 							</small>
 						</div>
-						<button type='submit' className='btn'>
+						<button
+							disabled={!topic.trim() || !keywords.trim()}
+							type='submit'
+							className='btn'
+						>
 							Generate
 						</button>
 					</form>
@@ -96,6 +104,16 @@ NewPost.getLayout = function getLayout(page, pageProps) {
 export const getServerSideProps = withPageAuthRequired({
 	async getServerSideProps(ctx) {
 		const props = await getAppProps(ctx)
+
+		if (!props.availableTokens) {
+			return {
+				redirect: {
+					destination: '/token-topup',
+					permanent: false,
+				},
+			}
+		}
+
 		return { props }
 	},
 })

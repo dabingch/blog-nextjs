@@ -14,11 +14,16 @@ export default function TokenTopup() {
 	}
 
 	return (
-		<div>
-			<h1>Token Top Up</h1>
-			<button className='btn' onClick={handleClick}>
-				Add tokens
-			</button>
+		<div className='bg-slate-100'>
+			<div className=' w-full h-full flex flex-col overflow-auto max-w-screen-sm items-center justify-center mx-auto'>
+				<h1>Token Top Up</h1>
+				<p className='font-bold text-red-500'>
+					You must have at least one token to fetch the post!
+				</p>
+				<button className='btn' onClick={handleClick}>
+					Add tokens
+				</button>
+			</div>
 		</div>
 	)
 }

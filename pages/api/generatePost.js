@@ -19,7 +19,13 @@ export default withApiAuthRequired(async function handler(req, res) {
 	const { topic, keywords } = req.body
 
 	if (!topic || !keywords) {
-		res.status(403).json({ error: 'Missing topic or keywords' })
+		res.status(422).json({ error: 'Missing topic or keywords' })
+		return
+	}
+
+	if (topic.length > 80 || keywords.length > 80) {
+		res.status(422).json({ error: 'Topic or keywords is too long' })
+		return
 	}
 
 	const config = new Configuration({
