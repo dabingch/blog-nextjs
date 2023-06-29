@@ -57,7 +57,6 @@ export default withApiAuthRequired(async function handler(req, res) {
 	})
 
 	const data = response.data.choices[0]?.text.split('\n').join('')
-	console.log(data)
 	const parsed = JSON.parse(data)
 
 	const post = await db.collection('posts').insertOne({
@@ -70,7 +69,9 @@ export default withApiAuthRequired(async function handler(req, res) {
 		created: new Date(),
 	})
 
-	res.status(200).json(post)
+	res.status(201).json({
+		postId: post.insertedId,
+	})
 
 	// * GPT-3.5
 	/*

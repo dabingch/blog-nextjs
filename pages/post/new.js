@@ -1,11 +1,13 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0'
 import { AppLayout } from '../../components/AppLayout'
 import { useState } from 'react'
+import { useRouter } from 'next/router'
 
 export default function NewPost({}) {
+	const router = useRouter()
+
 	const [topic, setTopic] = useState('')
 	const [keywords, setKeywords] = useState('')
-	const [postContent, setPostContent] = useState('')
 
 	const handleSubmit = async (e) => {
 		e.preventDefault()
@@ -19,11 +21,9 @@ export default function NewPost({}) {
 		})
 
 		const data = await response.json()
-		setPostContent(data.postContent)
-
-		// const json = await response.json()
-		// console.log(json.post.postContent)
-		// setPostContent(json.post.postContent)
+		if (data?.postId) {
+			router.push(`/post/${data.postId}`)
+		}
 	}
 
 	return (
@@ -53,10 +53,10 @@ export default function NewPost({}) {
 					Generate
 				</button>
 			</form>
-			<div
+			{/* <div
 				className='max-w-screen-sm p-10'
 				dangerouslySetInnerHTML={{ __html: postContent }}
-			></div>
+			></div> */}
 		</div>
 	)
 }
