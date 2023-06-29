@@ -9,4 +9,4 @@
 -   tailwind
 -   create utils to pass props to the layout
 -   stripe payment
--   Cors from micro-cors
+-   Cors from micro-cors (/api/webhooks/stripe.js)
