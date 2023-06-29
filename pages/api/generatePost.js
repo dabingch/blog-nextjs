@@ -18,7 +18,7 @@ export default withApiAuthRequired(async function handler(req, res) {
 
 	const { topic, keywords } = req.body
 
-	if (!topic || !keywords) {
+	if (!topic.trim() || !keywords.trim()) {
 		res.status(422).json({ error: 'Missing topic or keywords' })
 		return
 	}

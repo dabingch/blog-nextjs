@@ -25,6 +25,7 @@ export const getAppProps = async (ctx) => {
 		.find({
 			userId: existedUser._id,
 		})
+		.limit(2)
 		.sort({ created: -1 })
 		.toArray()
 
