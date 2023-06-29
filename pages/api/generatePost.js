@@ -7,27 +7,114 @@ export default async function handler(req, res) {
 
 	const openai = new OpenAIApi(config)
 
-	const topic = 'Top 10 tips for dog owners'
-	const keywords =
-		'first-time dog owners, common dog health issues, best dog breeds'
+	const { topic, keywords } = req.body
 
-	const response = await openai.createCompletion({
-		model: 'text-davinci-003',
+	// * Old model version
+	// const response = await openai.createCompletion({
+	// 	model: 'text-davinci-003',
+	// 	temperature: 0,
+	// 	max_tokens: 3600,
+	// 	prompt: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}.
+	//   The content should be formatted in SEO-friendly HTML.
+	//   The response must also include appropriate HTML title and meta description content.
+	//   The return format must be stringified JSON in the following format:
+	//   {
+	//     "postContent": post content here,
+	//     "title": title here,
+	//     "metaDescription": meta description goes here
+	//   }
+	//   `,
+	// })
+
+	// res.status(200).json({
+	// 	post: JSON.parse(response.data.choices[0]?.text.split('\n').join('')),
+	// })
+
+	// * GPT-3.5
+	const postContentResponse = await openai.createChatCompletion({
+		model: 'gpt-3.5-turbo',
 		temperature: 0,
-		max_tokens: 3600,
-		prompt: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}. 
-    The content should be formatted in SEO-friendly HTML.
-    The response must also include appropriate HTML title and meta description content.
-    The return format must be stringified JSON in the following format:
-    {
-      "postContent": post content here,
-      "title": title here,
-      "metaDescription": meta description goes here
-    }
-    `,
+		messages: [
+			{
+				role: 'system',
+				content: 'You are a blog post generator',
+			},
+			{
+				role: 'user',
+				content: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}.
+	      The content should be formatted in SEO-friendly HTML,
+        limited to the following HTML tags: p, h1, h2, h3, h4, h5, h6, strong, li, ol, ul, i.`,
+			},
+		],
 	})
 
+	const postContent =
+		postContentResponse.data.choices[0]?.message?.content || ''
+
+	const titleResponse = await openai.createChatCompletion({
+		model: 'gpt-3.5-turbo',
+		temperature: 0,
+		messages: [
+			{
+				role: 'system',
+				content: 'You are a blog post generator',
+			},
+			{
+				role: 'user',
+				content: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}.
+	      The content should be formatted in SEO-friendly HTML,
+        limited to the following HTML tags: p, h1, h2, h3, h4, h5, h6, strong, li, ol, ul, i.`,
+			},
+			{
+				role: 'assistant',
+				content: 'postContent',
+			},
+			{
+				role: 'user',
+				content:
+					'Generate appropriate title tag text for the above blog post',
+			},
+		],
+	})
+
+	const metaDescriptionResponse = await openai.createChatCompletion({
+		model: 'gpt-3.5-turbo',
+		temperature: 0,
+		messages: [
+			{
+				role: 'system',
+				content: 'You are a blog post generator',
+			},
+			{
+				role: 'user',
+				content: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}.
+	      The content should be formatted in SEO-friendly HTML,
+        limited to the following HTML tags: p, h1, h2, h3, h4, h5, h6, strong, li, ol, ul, i.`,
+			},
+			{
+				role: 'assistant',
+				content: 'postContent',
+			},
+			{
+				role: 'user',
+				content: `Generate SEO-friendly meta description for the above blog post`,
+			},
+		],
+	})
+
+	const title = titleResponse.data.choices[0]?.message?.content || ''
+	const metaDescription =
+		metaDescriptionResponse.data.choices[0]?.message?.content || ''
+
+	// console.log('Post content: ', postContent)
+	console.log('Title: ', title)
+	console.log('Meta description: ', metaDescription)
+
 	res.status(200).json({
-		post: JSON.parse(response.data.choices[0]?.text).split('\n').join(''),
+		post: {
+			postContent,
+			title,
+			metaDescription,
+		},
 	})
 }
