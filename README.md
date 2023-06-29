@@ -8,3 +8,5 @@
 -   pass props in pages
 -   tailwind
 -   create utils to pass props to the layout
+-   stripe payment
+-   Cors from micro-cors

@@ -1,6 +1,9 @@
 import { getSession } from '@auth0/nextjs-auth0'
 import clientPromise from '../lib/mongodb'
 
+/**
+ * A helper function to get all the needed props
+ */
 export const getAppProps = async (ctx) => {
 	const { user } = await getSession(ctx.req, ctx.res)
 	const client = await clientPromise
