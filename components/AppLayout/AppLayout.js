@@ -12,6 +12,7 @@ export const AppLayout = ({
 	availableTokens,
 	posts: postsFromSSR,
 	postId,
+	postCreated,
 }) => {
 	const { user, error, isLoading } = useUser()
 
@@ -20,7 +21,17 @@ export const AppLayout = ({
 
 	useEffect(() => {
 		setPostsFromSSR(postsFromSSR)
-	}, [postsFromSSR, setPostsFromSSR])
+
+		if (postId) {
+			const exists = postsFromSSR.find((post) => post._id === postId)
+
+			// if the current post id does not exist,
+			// means that user has refreshed the page
+			if (!exists) {
+				getPosts({ lastPostDate: postCreated, getNewerPosts: true })
+			}
+		}
+	}, [postsFromSSR, setPostsFromSSR, postId, postCreated, getPosts])
 
 	const handleLoadMorePost = async () => {
 		await getPosts({ lastPostDate: posts[posts.length - 1].created })
