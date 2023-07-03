@@ -5,8 +5,31 @@ import clientPromise from '../../lib/mongodb'
 import { ObjectId } from 'mongodb'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHashtag } from '@fortawesome/free-solid-svg-icons'
+import { useContext, useState } from 'react'
+import { useRouter } from 'next/router'
+import { PostsContext } from '../../context/postContext'
 
 export default function Post(props) {
+	const router = useRouter()
+	const { deletePost } = useContext(PostsContext)
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+	const handleDeletePost = async () => {
+		try {
+			const response = await fetch('/api/deletePost', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify(props.postId),
+			})
+
+			const data = await response.json()
+			if (data.success) {
+				deletePost(props.postId)
+				router.replace('/post/new')
+			}
+		} catch (error) {}
+	}
+
 	return (
 		<div className='overflow-auto h-full'>
 			<div className='max-w-screen-sm mx-auto'>
@@ -40,6 +63,38 @@ export default function Post(props) {
 						__html: props.postContent || '',
 					}}
 				/>
+				{!showDeleteConfirm && (
+					<div className='my-4'>
+						<button
+							onClick={() => setShowDeleteConfirm(true)}
+							className='btn bg-red-600 hover:bg-red-700'
+						>
+							Delete Post
+						</button>
+					</div>
+				)}
+				{showDeleteConfirm && (
+					<div className='my-4'>
+						<p className='p-2 bg-red-300 text-center text-bold'>
+							Are you sure you want to delete this post? This
+							action is irreversible
+						</p>
+						<div className='grid grid-cols-2 gap-2'>
+							<button
+								className='btn bg-red-600 hover:bg-red-700'
+								onClick={handleDeletePost}
+							>
+								Confirm Delete
+							</button>
+							<button
+								onClick={() => setShowDeleteConfirm(false)}
+								className='btn bg-stone-600 hover:bg-stone-700'
+							>
+								Cancel
+							</button>
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	)
@@ -77,6 +132,7 @@ export const getServerSideProps = withPageAuthRequired({
 
 			return {
 				props: {
+					postId: ctx.params.postId,
 					postContent: post.postContent,
 					title: post.title,
 					metaDescription: post.metaDescription,

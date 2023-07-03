@@ -12,3 +12,4 @@
 -   stripe payment
 -   Cors from micro-cors (/api/webhooks/stripe.js)
 -   useCallback()
+-   Redisplay current post in the side page when the user refreshes the page
