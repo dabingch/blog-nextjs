@@ -1,17 +1,14 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useReducer, useState } from 'react'
 
 export const PostsContext = React.createContext({})
 
-export const PostsProvider = ({ children }) => {
-	const [posts, setPosts] = useState([])
-	const [isNoMorePost, setIsNoMorePost] = useState(false)
+const initialState = []
 
-	const setPostsFromSSR = useCallback((postsFromSSR = []) => {
-		// ! We can't write like this since these two functions share same posts state
-		// setPosts((oldValue) => [...oldValue, ...postsFromSSR])
-		setPosts((oldValue) => {
-			const newPosts = [...oldValue]
-			postsFromSSR.forEach((post) => {
+function postReducer(state, action) {
+	switch (action.type) {
+		case 'add_post': {
+			const newPosts = [...state]
+			action.payload.forEach((post) => {
 				const existedPost = newPosts.find((p) => p._id === post._id)
 				if (!existedPost) {
 					newPosts.push(post)
@@ -19,7 +16,23 @@ export const PostsProvider = ({ children }) => {
 			})
 
 			return newPosts
-		})
+		}
+		case 'delete_post': {
+			const newPosts = state.filter((post) => post._id !== action.payload)
+
+			return newPosts
+		}
+		default:
+			return state
+	}
+}
+
+export const PostsProvider = ({ children }) => {
+	const [posts, dispatch] = useReducer(postReducer, initialState)
+	const [isNoMorePost, setIsNoMorePost] = useState(false)
+
+	const setPostsFromSSR = useCallback((postsFromSSR = []) => {
+		dispatch({ type: 'add_post', payload: postsFromSSR })
 	}, [])
 
 	const getPosts = useCallback(
@@ -35,28 +48,13 @@ export const PostsProvider = ({ children }) => {
 				setIsNoMorePost(true)
 			}
 
-			// setPosts((oldValue) => [...oldValue, ...postsResult])
-			setPosts((oldValue) => {
-				const newPosts = [...oldValue]
-				postsResult.forEach((post) => {
-					const existedPost = newPosts.find((p) => p._id === post._id)
-					if (!existedPost) {
-						newPosts.push(post)
-					}
-				})
-
-				return newPosts
-			})
+			dispatch({ type: 'add_post', payload: postsResult })
 		},
 		[]
 	)
 
 	const deletePost = useCallback((postId) => {
-		setPosts((oldPosts) => {
-			const newPosts = oldPosts.filter((post) => post._id !== postId)
-
-			return newPosts
-		})
+		dispatch({ type: 'delete_post', payload: postId })
 	}, [])
 
 	return (
