@@ -1,43 +1,43 @@
-import Cors from 'micro-cors'
-import stripeInit from 'stripe'
-import verifyStripe from '@webdeveducation/next-verify-stripe'
-import clientPromise from '../../../lib/mongodb'
+import Cors from "micro-cors";
+import stripeInit from "stripe";
+import verifyStripe from "@webdeveducation/next-verify-stripe";
+import clientPromise from "../../../lib/mongodb";
 
 const cors = Cors({
-	allowMethods: ['POST', 'HEAD'],
-})
+	allowMethods: ["POST", "HEAD"],
+});
 
 export const config = {
 	api: {
 		bodyParser: false,
 	},
-}
+};
 
-const stripe = stripeInit(process.env.STRIPE_SECRET_KEY)
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET
+const stripe = stripeInit(process.env.STRIPE_SECRET_KEY);
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 const handler = async (req, res) => {
-	if (req.method === 'POST') {
-		let event
+	if (req.method === "POST") {
+		let event;
 		try {
 			event = await verifyStripe({
 				req,
 				stripe,
 				endpointSecret,
-			})
+			});
 		} catch (error) {
-			console.log(error)
+			console.log(error);
 		}
 
 		switch (event.type) {
-			case 'payment_intent.succeeded': {
-				const client = await clientPromise
-				const db = await client.db('blogpostai')
+			case "payment_intent.succeeded": {
+				const client = await clientPromise;
+				const db = await client.db("blogpostai");
 
-				const paymentIntent = event.data.object
-				const auth0Id = paymentIntent.metadata.sub
+				const paymentIntent = event.data.object;
+				const auth0Id = paymentIntent.metadata.sub;
 
-				const userProfile = await db.collection('users').updateOne(
+				const userProfile = await db.collection("users").updateOne(
 					{
 						auth0Id, // find the user who has paid with the auth0Id
 					},
@@ -50,18 +50,19 @@ const handler = async (req, res) => {
 						},
 					},
 					{
+						// upsert: true means if the user doesn't exist, create a new one
 						upsert: true,
 					}
-				)
+				);
 
-				break
+				break;
 			}
 			default:
-				console.log(`Unhandled event type ${event.type}`)
+				console.log(`Unhandled event type ${event.type}`);
 		}
 
-		res.status(200).json({ received: true })
+		res.status(200).json({ received: true });
 	}
-}
+};
 
-export default cors(handler)
+export default cors(handler);
