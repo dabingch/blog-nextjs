@@ -1,11 +1,11 @@
-import { useContext, useEffect } from 'react'
-import { PostsContext } from '../../context/postContext'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Logo } from '../Logo'
-import { faCoins } from '@fortawesome/free-solid-svg-icons'
-import { useUser } from '@auth0/nextjs-auth0/client'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useContext, useEffect } from 'react';
+import { PostsContext } from '../../context/postContext';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Logo } from '../Logo';
+import { faCoins } from '@fortawesome/free-solid-svg-icons';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const AppLayout = ({
 	children,
@@ -14,33 +14,33 @@ export const AppLayout = ({
 	postId,
 	postCreated,
 }) => {
-	const { user, error, isLoading } = useUser()
+	const { user, error, isLoading } = useUser();
 
 	const { setPostsFromSSR, posts, getPosts, isNoMorePost } =
-		useContext(PostsContext)
+		useContext(PostsContext);
 
 	useEffect(() => {
-		setPostsFromSSR(postsFromSSR)
+		setPostsFromSSR(postsFromSSR);
 
 		if (postId) {
-			const exists = postsFromSSR.find((post) => post._id === postId)
+			const exists = postsFromSSR.find((post) => post._id === postId);
 
 			// if the current post id does not exist,
 			// means that user has refreshed the page
 			if (!exists) {
-				getPosts({ lastPostDate: postCreated, getNewerPosts: true })
+				getPosts({ lastPostDate: postCreated, getNewerPosts: true });
 			}
 		}
-	}, [postsFromSSR, setPostsFromSSR, postId, postCreated, getPosts])
+	}, [postsFromSSR, setPostsFromSSR, postId, postCreated, getPosts]);
 
 	const handleLoadMorePost = async () => {
-		await getPosts({ lastPostDate: posts[posts.length - 1].created })
-	}
+		await getPosts({ lastPostDate: posts[posts.length - 1].created });
+	};
 
 	return (
 		<div className='grid grid-cols-[300px_1fr] h-screen max-h-screen'>
-			<div className='flex flex-col text-white overflow-hidden'>
-				<div className='bg-slate-800 px-2'>
+			<div className='flex flex-col overflow-hidden text-white'>
+				<div className='px-2 bg-slate-800'>
 					<Logo />
 					<Link href='/post/new' className='btn'>
 						New Post
@@ -58,7 +58,7 @@ export const AppLayout = ({
 						</span>
 					</Link>
 				</div>
-				<div className='px-4 flex-1 overflow-auto bg-gradient-to-b from-slate-800 to-cyan-800'>
+				<div className='flex-1 px-4 overflow-auto bg-gradient-to-b from-slate-800 to-cyan-800'>
 					{posts?.map((post) => (
 						<Link
 							key={post._id}
@@ -75,13 +75,13 @@ export const AppLayout = ({
 					{!isNoMorePost && (
 						<div
 							onClick={handleLoadMorePost}
-							className='hover:underline text-sm text-slate-400 text-center cursor-pointer mt-4'
+							className='mt-4 text-sm text-center cursor-pointer hover:underline text-slate-400'
 						>
 							Load more posts
 						</div>
 					)}
 				</div>
-				<div className='bg-cyan-800 flex items-center gap-2 border-t border-t-black/50 h-20 px-2'>
+				<div className='flex items-center h-20 gap-2 px-2 border-t bg-cyan-800 border-t-black/50'>
 					{isLoading && <p>Loading login info...</p>}
 					{error && <p>{error.message}</p>}
 					{user ? (
@@ -95,7 +95,7 @@ export const AppLayout = ({
 									className='rounded-full'
 								/>
 							</div>
-							<div className='flex-1 flex-col gap-2'>
+							<div className='flex-col flex-1 gap-2'>
 								<div className='font-bold'>{user.email}</div>
 								<Link
 									className='text-sm'
@@ -112,5 +112,5 @@ export const AppLayout = ({
 			</div>
 			{children}
 		</div>
-	)
-}
+	);
+};
